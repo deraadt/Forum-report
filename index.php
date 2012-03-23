@@ -26,13 +26,20 @@
 require('../../config.php');
 require('lib.php');
 
-// Get course and context
+// Get passed parameters
 $courseid = required_param('course', PARAM_INT);
+$forumselected = optional_param('forum', null, PARAM_INT);
+
+// Get course and context
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $context = context_course::instance($course->id);
 
 // Set up page
-$url = new moodle_url('/report/forum/index.php', array('course'=>$course->id));
+$urlparams = array('course'=>$course->id);
+if($forumselected) {
+    $urlparams['forum'] = $forumselected;
+}
+$url = new moodle_url('/report/forum/index.php', $urlparams);
 $PAGE->set_url($url);
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('report');
@@ -46,40 +53,59 @@ require_capability('report/forumreport:view', $context);
 // Start the page
 echo $OUTPUT->header();
 
-// Get count of user postings
-$query = "SELECT p.userid, COUNT(p.id) as posts
-            FROM {forum} f, {forum_discussions} d, {forum_posts} p
-           WHERE f.course = :courseid
-             AND f.id = d.forum
-             AND p.discussion = d.id
-        GROUP BY p.userid
-        ORDER BY posts DESC;";
+// Output the list of forums
+$query = "SELECT id, name
+            FROM {forum}
+           WHERE course = :courseid";
 $params = array('courseid' => $courseid);
-$postsummary = $DB->get_records_sql($query, $params);
+$forums = $DB->get_records_sql($query, $params);
+$selectoptions = array(0 => get_string('allforums', 'report_forum'));
+foreach($forums as $forum) {
+    $selectoptions[$forum->id] = $forum->name;
+}
+echo HTML_WRITER::start_tag('div', array('class' => 'report_forum_selector'));
+echo get_string('selectforum', 'report_forum').': ';
+echo $OUTPUT->single_select($url, 'forum', $selectoptions, $forumselected, null, 'forumform');
+echo $OUTPUT->help_icon('selectingaforum', 'report_forum');
+echo HTML_WRITER::end_tag('div');
 
-// Get count of discusions created
-$query = "SELECT d.userid, COUNT(d.id) as discussions
-            FROM {forum} f, {forum_discussions} d
-           WHERE f.course = :courseid
-             AND f.id = d.forum
-        GROUP BY d.userid
-        ORDER BY discussions DESC;";
-$discussionssummary = $DB->get_records_sql($query, $params);
+// Apply a forum restriction if supplied
+$tablewhere = '';
+if($forumselected > 0) {
+    $tablewhere = 'AND d.forum = '.$forumselected;
+    $url->par = $forumselected;
+}
 
-// Get user information
-$query = "SELECT u.id, firstname, lastname, lastaccess, picture, imagealt, email
+// Get user information and forum involvment
+// TO-DO test if this scales, otherwise split into separate queries and merge in PHP
+$query = "SELECT u.id, firstname, lastname, lastaccess, picture, imagealt, email,
+                 (
+                     SELECT COUNT(*)
+                       FROM {forum_discussions} d, {forum_posts} p
+                      WHERE d.course = :courseid1
+                        $tablewhere
+                        AND d.id = p.discussion
+                        AND p.userid = u.id
+                 ) AS posts,
+                 (
+                     SELECT COUNT(*)
+                       FROM {forum_discussions} d
+                      WHERE d.course = :courseid2
+                        $tablewhere
+                        AND d.userid = u.id
+                 ) AS discussions
             FROM {role_assignments} r, {user} u
            WHERE r.contextid = :contextid
              AND r.userid = u.id";
-$params = array('contextid' => $context->id);
+$params = array('courseid1' => $courseid, 'courseid2' => $courseid, 'contextid' => $context->id);
 $users = $DB->get_records_sql($query, $params);
 
 // Mash the user, discussion and post data into one array
 if (!empty($users)) {
     foreach ($users as $user) {
         $user->fullname    = fullname($user);
-        $user->posts       = array_key_exists($user->id, $postsummary)?$postsummary[$user->id]->posts:0;
-        $user->discussions = array_key_exists($user->id, $discussionssummary)?$discussionssummary[$user->id]->discussions:0;
+//        $user->posts       = array_key_exists($user->id, $postsummary)?$postsummary[$user->id]->posts:0;
+//        $user->discussions = array_key_exists($user->id, $discussionssummary)?$discussionssummary[$user->id]->discussions:0;
         $user->picture     = $OUTPUT->user_picture($user, array('course'=>$courseid));
     }
     $users = array_values($users);
@@ -96,7 +122,7 @@ $tableheaders = array(
     get_string('discussions', 'report_forum')
 );
 $table->define_headers($tableheaders);
-$table->define_baseurl($PAGE->url);
+$table->define_baseurl($url);
 $table->sortable(true);
 $table->collapsible(false);
 $table->initialbars(false);
@@ -112,8 +138,7 @@ $table->setup();
 
 // Sort the information based on the table's sort
 if (!$sort = $table->get_sql_sort()) {
-     $sort = 'posts DESC, lastname ASC';
-     $table->set_sql_sort($sort);
+     $sort = 'posts ASC, lastname DESC';
 }
 if (!empty($users)) {
     usort($users, 'compare_users');

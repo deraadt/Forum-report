@@ -69,10 +69,10 @@ function compare_users ($a, $b) {
 
         // Check if order can be established
         if ($a->$aspect < $b->$aspect) {
-            return $ascdesc=='ASC'?-1:1;
+            return $ascdesc=='ASC'?1:-1;
         }
         if ($a->$aspect > $b->$aspect) {
-            return $ascdesc=='ASC'?1:-1;
+            return $ascdesc=='ASC'?-1:1;
         }
     }
 

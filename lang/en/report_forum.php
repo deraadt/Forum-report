@@ -24,8 +24,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['allforums'] = 'All forums';
+$string['discussions'] = 'Discussions';
 $string['forumreport:view'] = 'View course forum participation';
 $string['pluginname'] = 'Forum overview';
-$string['discussions'] = 'Discussions';
 $string['posts'] = 'Posts';
+$string['selectforum'] = 'Select a forum';
+$string['selectingaforum'] = 'Selecting a forum';
+$string['selectingaforum_help'] = 'Selecting a forum will show the activity in only that forum.';
 $string['title'] = 'Forum overview';
