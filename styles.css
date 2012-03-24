@@ -1,0 +1,8 @@
+.report_forum_selector { 
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.report_forum_selector #forumform, .report_forum_selector .singleselect, .report_forum_selector div {
+    display: inline;
+}
