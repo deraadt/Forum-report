@@ -47,35 +47,3 @@ function report_forum_extend_navigation_course($navigation, $course, $context) {
         );
     }
 }
-
-/**
- * Compares two users for ordering
- *
- * @param  mixed $a element containing name, post count and discussion count
- * @param  mixed $b element containing name, post count and discussion count
- * @return order of pair expressed as -1, 0, or 1
- */
-function compare_users ($a, $b) {
-    global $sort;
-
-    // Process each of the one or two orders
-    $orders = explode(',', $sort);
-    foreach ($orders as $order) {
-
-        // Extract the order information
-        $orderelements = explode(' ', trim($order));
-        $aspect = $orderelements[0];
-        $ascdesc = $orderelements[1];
-
-        // Check if order can be established
-        if ($a->$aspect < $b->$aspect) {
-            return $ascdesc=='ASC'?1:-1;
-        }
-        if ($a->$aspect > $b->$aspect) {
-            return $ascdesc=='ASC'?-1:1;
-        }
-    }
-
-    // If previous ordering fails, consider values equal
-    return 0;
-}

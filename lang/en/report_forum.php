@@ -25,10 +25,11 @@
  */
 
 $string['allforums'] = 'All forums';
-$string['discussions'] = 'Discussions';
+$string['discussions'] = 'Discussions created';
 $string['forumreport:view'] = 'View course forum participation';
 $string['pluginname'] = 'Forum overview';
 $string['posts'] = 'Posts';
+$string['readcount'] = 'Discussion read count';
 $string['selectforum'] = 'Select a forum';
 $string['selectingaforum'] = 'Selecting a forum';
 $string['selectingaforum_help'] = 'Selecting a forum will show the activity in only that forum.';
