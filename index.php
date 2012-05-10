@@ -37,7 +37,7 @@ $context = context_course::instance($course->id);
 
 // Set up page
 $urlparams = array('course'=>$course->id);
-if($forumselected) {
+if ($forumselected) {
     $urlparams['forum'] = $forumselected;
 }
 $url = new moodle_url('/report/forum/index.php', $urlparams);
@@ -50,7 +50,7 @@ $PAGE->set_heading($course->fullname);
 
 // Check permissions
 require_login($course);
-require_capability('report/forumreport:view', $context);
+require_capability('report/forum:view', $context);
 
 // Start the page
 echo $OUTPUT->header();
@@ -63,7 +63,7 @@ $query = "SELECT id, name
 $params = array('courseid' => $courseid);
 $forums = $DB->get_records_sql($query, $params);
 $selectoptions = array(0 => get_string('allforums', 'report_forum'));
-foreach($forums as $forum) {
+foreach ($forums as $forum) {
     $selectoptions[$forum->id] = $forum->name;
 }
 echo HTML_WRITER::start_tag('div', array('class' => 'report_forum_selector'));
@@ -101,7 +101,7 @@ $table->setup();
 // Apply a forum restriction if supplied
 $tablewhere = '';
 $cmidwhere  = '';
-if($forumselected > 0) {
+if ($forumselected > 0) {
     $tablewhere = 'AND d.forum = '.$forumselected;
     $coursemodule = get_coursemodule_from_instance('forum', $forumselected, $courseid);
     $cmidwhere  = 'AND l.cmid = '.$coursemodule->id;

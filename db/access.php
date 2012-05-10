@@ -25,7 +25,7 @@
 
 $capabilities = array(
 
-    'report/forumreport:view' => array(
+    'report/forum:view' => array(
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,

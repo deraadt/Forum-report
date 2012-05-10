@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die;
 function report_forum_extend_navigation_course($navigation, $course, $context) {
     global $CFG;
 
-    if (has_capability('report/forumreport:view', $context)) {
+    if (has_capability('report/forum:view', $context)) {
         $url = new moodle_url('/report/forum/index.php', array('course'=>$course->id));
         $navigation->add(
             get_string('pluginname', 'report_forum'),

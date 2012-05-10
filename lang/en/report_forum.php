@@ -18,15 +18,14 @@
  * Lang strings
  *
  * @package    report
- * @subpackage completion
- * @copyright  2009 Catalyst IT Ltd
- * @author     Aaron Barnes <aaronb@catalyst.net.nz>
+ * @subpackage forumreport
+ * @copyright  2012 Michael de Raadt <michaeld@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 $string['allforums'] = 'All forums';
 $string['discussions'] = 'Discussions created';
-$string['forumreport:view'] = 'View course forum participation';
+$string['forum:view'] = 'View course forum participation';
 $string['pluginname'] = 'Forum overview';
 $string['posts'] = 'Posts';
 $string['readcount'] = 'Discussion read count';
